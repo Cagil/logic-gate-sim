@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<!--<link rel="stylesheet" type="text/css" href="header.css">-->
+		<link rel="stylesheet" type="text/css" href="layout.css">
+		<!--<link rel="stylesheet" Cache-control="Public" type="text/css" href="http://fonts.googleapis.com/css?family=Merriweather Sans">-->
+		
+
+	
+
+        <title></title>    
+	</head>
+	
+	<body onload="javascript:initialise()">
+		<!-- include header html php -->
+	
+	<!-- #############MAIN CONTENT START##################### -->
+	<div id="content">	
+		<div class="page_center">
+			<div class="incontent_box">
+				<div id="canvas_1_status" class="canvas_status_bar"></div>
+				<canvas id="canvas_1" width="720px" tabindex="1" height="400px">Your browser dosen't support the HTML5 canvas.</canvas>
+			</div>
+
+
+			
+				
+<button width="100px" height="50px" onclick="javascript:addInput()">Add Input </button>
+<button width="100px" height="50px" onclick="javascript:addOutput()">Add Output </button>
+<button width="100px" height="50px" onclick="javascript:addGate('not_gate')">Add NOT GATE </button>
+<button width="100px" height="50px" onclick="javascript:addGate('xor_gate')">Add XOR GATE </button>
+<button width="100px" height="50px" onclick="javascript:addGate('and_gate')">Add AND GATE </button>
+<button width="100px" height="50px" onclick="javascript:addGate('or_gate')">Add OR GATE </button>
+			
+		<!--content page_center</div>-->
+		</div>
+
+
+	
+
+	</div>
+
+	
+
+	<!-- #############MAIN CONTENT END######################## -->	
+	 <script type="text/javascript" src="funcbundle.js"></script>
+		  <script type="text/javascript" src="logicgates.js"></script>
+	<script>
+
+	 var list_1 = []; var mpi_1 = new MPI(list_1);
+	
+	// TODO fix/ tidy up inits
+	function initialise(){
+			 			var gate,i1, i2, o1;
+	var gate2, gate3, i3, i4, o2;
+                        gate = new Gate();
+                        gate.init(300,300, 'and_gate');
+                        gate2 = new Gate();
+                        gate2.init(200, 300, 'or_gate');
+                        gate3 = new Gate();
+                        gate3.init(100, 300, 'xor_gate');
+		i1 = new GateInput(25,100);
+	i2 = new GateInput(25,150);
+	i3 = new GateInput(25, 200);
+	i4 = new GateInput(25, 250);
+	o1 = new Display(200,100);
+	o2 = new Display(200, 150);
+	list_1.push(i1);
+	list_1.push(i2);
+	list_1.push(i3);
+	list_1.push(i4);
+	list_1.push(o2);
+	list_1.push(o1);
+	list_1.push(gate2);
+	list_1.push(gate3);
+	list_1.push(gate);	}
+
+	function addInput(){
+		var inew = new GateInput(25, 20);
+		list_1.push(inew);
+	}
+
+	function addOutput(){
+		var onew = new Display(50, 20);
+		list_1.push(onew);
+	}
+
+	function addGate(gate_type){
+		switch(gate_type){
+			case "xor_gate" :
+			case "or_gate":
+			case "and_gate":
+			case "not_gate":
+			var gate = new Gate();
+			gate.init(0, 20, gate_type);
+			list_1.push(gate);
+			break;
+		}
+	}
+
+	document.addEventListener('onload', function(evt){initialise();});
+
+	var renderer_2 = new Renderer('canvas_1', mpi_1,'canvas_1_status');
+				renderer_2.passList(list_1);
+    renderer_2.run(renderer_2);
+
+    //EVENT LISTENER FOR MOUSE MOVEMENT
+	renderer_2.canvas.addEventListener('mousemove',function(evt){
+	    var mousePos = getMousePos(renderer_2.canvas, evt);
+
+		renderer_2.mpi.draw(renderer_2.context, mousePos);
+		
+		for(var i = 0;i<renderer_2.itemList.length; i++){
+			if(isset(renderer_2.itemList[i])){
+				if(renderer_2.itemList[i] instanceof Gate){		
+					renderer_2.itemList[i].isFocused(mousePos, renderer_2.status_bar);
+				}else
+					renderer_2.itemList[i].isFocused(mousePos);
+			}
+		}
+	}, false);
+
+	//EVENT LISTENER FOR MOUSE CLICKS
+	renderer_2.canvas.addEventListener('mousedown', function(evt){
+	   	var mousePos = getMousePos(renderer_2.canvas, evt);
+	    		    
+	    var i = 0;
+		for(i = 0;i<renderer_2.itemList.length; i++){
+			if(isset(renderer_2.itemList[i])){
+					if(renderer_2.itemList[i].isClicked(mousePos, renderer_2.mpi)){
+						break;
+					}	
+			}
+		}		
+	}, false);
+
+	renderer_2.canvas.addEventListener('keydown', function(evt){
+		var mousePos = getMousePos(renderer_2.canvas, evt);
+		var keycode = evt.keyCode;
+		switch(keycode){
+			// DROP MPI SELECTED OBJECT
+			case 88:// X
+				var mpi_obj = renderer_2.mpi.obj;
+				if(isset(mpi_obj)){
+					renderer_2.mpi.dropObj(mousePos);
+				}
+			break;
+
+			// SET A NODE TO BE ROOT
+			case 82:// R
+				if(isset(renderer_2.mpi.obj)){
+					renderer_2.mpi.obj = undefined;
+				}
+				if(ACTION_MODE){
+					ACTION_MODE = false;
+
+				}else{
+					ACTION_MODE = true;
+					for(var i = 0; i < renderer_2.itemList.length; i++){
+						if(!renderer_2.itemList[i].selected){
+							renderer_2.itemList[i].insideColor = 'white';
+						}
+					}
+				}
+			break;			
+			default:
+				console.log('Invalid key code input in keydown EventListener; val = ' + keycode);
+				break;
+
+		}
+	}, true); 
+        
+	  
+	
+    
+        
+	</script>
+	</body>
+	
+
+
+		
+
+ </html>
+
+
+	
